@@ -80,9 +80,15 @@ int main()
 tree_t *expr()
 {
 	tree_t * value = term();
-	while ( current_token == '+' ) {
-		match( '+' );
-		value = make_tree( '+', value, term(), current_attribute );
+	while ( (current_token == '+') || (current_token == '-') ) { //will leave the case of +- to error out
+		if(current_token == '+'){
+			match( '+' );
+			value = make_tree( '+', value, term(), current_attribute );
+		}
+		else{
+			match( '-' );
+			value = make_tree( '-', value, factor() , current_attribute);
+		}
 	}
 	return value;
 }
@@ -91,9 +97,15 @@ tree_t *expr()
 tree_t *term()
 {
 	tree_t *value = factor();
-	while ( current_token == '*' ) {
-		match( '*' );
-		value = make_tree( '*', value, factor() , current_attribute);
+	while ( (current_token == '*') || (current_token == '/') ) { //will leave the case of */ to error out
+		if( current_token == '*'){
+			match( '*' );
+			value = make_tree( '*', value, factor() , current_attribute);
+		}
+		else{
+			match( '/' );
+			value = make_tree( '/', value, factor() , current_attribute);
+		}
 	}
 	return value;
 }
@@ -134,7 +146,7 @@ int get_token()
 	int c, value;
 	while ( (c=getchar()) != EOF ) {
 		switch (c) {
-		case '+': case '*': /* OPERATORS */
+		case '+': case '*': case '/': case '-': /* OPERATORS */
 			fprintf( stderr, "[OP:%c]", c );
 			return c;
 		case '(': case ')': /* BRACKETS*/ 
