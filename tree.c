@@ -49,6 +49,16 @@ void aux_print_tree( tree_t *t, int spaces )
 		aux_print_tree( t->left, spaces+4 );
 		aux_print_tree( t->right, spaces+4 );
 		break;
+	case '/':
+		fprintf( stderr, "[MULOP:%c]\n", t->type );
+		aux_print_tree( t->left, spaces+4 );
+		aux_print_tree( t->right, spaces+4 );
+		break;
+	case '-':
+		fprintf( stderr, "[ADDOP:%c]\n", t->type );
+		aux_print_tree( t->left, spaces+4 );
+		aux_print_tree( t->right, spaces+4 );
+		break;
 	case NUM:
 		fprintf( stderr, "[NUM]\n" );
 		break;
@@ -66,13 +76,18 @@ int eval_tree( tree_t *t )
 		fprintf(stderr, "Panic in eval_tree\n");
 		exit(1);
 	} 
-
         switch( t->type ) {
         case '+':
                 t->evaluation = eval_tree(t->left) + eval_tree(t->right);
 		break;
         case '*':
                 t->evaluation = eval_tree(t->left) * eval_tree(t->right);
+		break;
+		case '-':
+                t->evaluation = eval_tree(t->left) - eval_tree(t->right);
+		break;
+		case '/': //be wary of floats -> another check?
+                t->evaluation = eval_tree(t->left) / eval_tree(t->right);
 		break;
         case NUM:
                 t->evaluation = t->attribute; //how to get the value out of NUM?
@@ -132,7 +147,11 @@ void gencode( tree_t *t, int *registers, int start, int r){
 
 	/* case 0 */
 	if( (t->left == NULL) && (t->right == NULL) && (t->rank == 1) ){
-		fprintf(fptr, "MOV %d, R%d\n", t->attribute, registers[start]);
+		// if(t->attribute == is num)
+			fprintf(fptr, "MOV %d, R%d\n", t->attribute, registers[start]);
+		//else{ //matrix
+
+		//}
 	}
 	else if( (t->left != NULL) || (t->right != NULL)){
 		right_rank = rank(t->right, 0);
@@ -141,10 +160,23 @@ void gencode( tree_t *t, int *registers, int start, int r){
 		/* case 1 */
 		if ( right_rank == 0 ){
 			gencode(t->left, registers, start, r);
-			if(t->type == '+')
+			switch (t->type){
+			case '+':
 				fprintf(fptr, "ADD %d, R%d\n", t->right->attribute, registers[start]);
-			else
+				break;
+			case '-':
+				fprintf(fptr, "SUB %d, R%d\n", t->right->attribute, registers[start]);
+				break;
+			case '*':
 				fprintf(fptr, "MUL %d, R%d\n", t->right->attribute, registers[start]);
+				break;
+			case '/':
+				fprintf(fptr, "DIV %d, R%d\n", t->right->attribute, registers[start]);
+				break;
+			default:
+				fprintf(stderr, "Error in code generation\n");
+				break;
+			}
 		}
 		/* case 2 */
 		else if (( 1 <= left_rank )&&( left_rank < right_rank )
@@ -154,10 +186,23 @@ void gencode( tree_t *t, int *registers, int start, int r){
 			popped = registers[start];
 			start++;
 			gencode(t->left, registers, start, r);
-			if(t->type == '+')
+			switch (t->type){
+			case '+':
 				fprintf(fptr, "ADD R%d, R%d\n", popped, registers[start]); //can also make pop registers[start-1]
-			else
+				break;
+			case '-':
+				fprintf(fptr, "SUB R%d, R%d\n", popped, registers[start]); //can also make pop registers[start-1]
+				break;
+			case '*':
 				fprintf(fptr, "MUL R%d, R%d\n", popped, registers[start]);
+				break;
+			case '/':
+				fprintf(fptr, "DIV R%d, R%d\n", popped, registers[start]); //can also make pop registers[start-1]
+				break;
+			default:
+				fprintf(stderr, "Error in code generation\n");
+				break;
+			}
 			start--;
 			swap_top(registers);
 		}
@@ -170,10 +215,23 @@ void gencode( tree_t *t, int *registers, int start, int r){
 			popped = registers[start];
 			start++;
 			gencode(t->right, registers, start, r);
-			if(t->type == '+')
+			switch (t->type){
+			case '+':
 				fprintf(fptr, "ADD R%d, R%d\n", registers[start], popped);
-			else
+				break;
+			case '-':
+				fprintf(fptr, "SUB R%d, R%d\n", registers[start], popped);
+				break;
+			case '*':
 				fprintf(fptr, "MUL R%d, R%d\n", registers[start], popped);
+				break;
+			case '/':
+				fprintf(fptr, "DIV R%d, R%d\n", registers[start], popped);
+				break;
+			default:
+				fprintf(stderr, "Error in code generation\n");
+				break;
+			}
 			//push
 			start--;
 		}
