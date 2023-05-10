@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "matrix.h"
 #include "y.tab.h"
+
+void aux_print_tree( tree_t *t, int spaces );
 
 tree_t *make_tree (int v, matrix_t *m,tree_t *l, tree_t *r) {
     tree_t *p = (tree_t *) malloc(sizeof(tree_t));
@@ -51,6 +54,9 @@ void aux_print_tree( tree_t *t, int spaces )
 		break;
 	case NUM:
 		fprintf( stderr, "[NUM]\n" );
+		break;
+	case MATRIX:
+		matrix_print(t->matrix);
 		break;
 	default:
 		fprintf( stderr, "Error: print_tree, unknown type\n" );

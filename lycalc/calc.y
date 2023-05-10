@@ -9,12 +9,14 @@ int matrix_name_holder = 0;
 int row = 0;
 int col = 0;
 list_t *matrix_ptr;
+tree_t *root; /*creating a tree for printing*/
+
 %}
 
 %union {    /* token attributes */
     int ival;   /* NUM */
     int opval;  /* ADDOP, MULOP */
-    int *pval[][];
+    int *pval;
 }
 
 %token <ival> NUM
@@ -34,12 +36,20 @@ boo: expr { fprintf( stderr, "\nValue = %d\n", $1); }
 expr: expr ADDOP expr
         {
             if( $2 == '+' ) $$ = $1 + $3;
+            /*add into the tree, set matrix to NULL*/
+            /*Semantic checking to test if operation is legal*/
             else $$ = $1 - $3;
+            /*add into tree, set matrix to NULL */
+            /*Semantic checking to test if operation is legal*/
         }
     | expr MULOP expr
         {
             if( $2 == '*' ) $$ = $1 * $3;
+            /*add into the tree, set matrix to NULL */
+            /*Semantic checking to test if multiplication is legal*/
             else $$ = $1 / $3;
+            /*add into the tree, set matrix to NULL*/
+            /*Semantic checking to test if operation is legal*/
         }
     | '(' expr ')'      { $$ = $2; }
     | NUM               { $$ = $1; }
@@ -55,6 +65,7 @@ expr: expr ADDOP expr
             row = 0;
             set_col(list_search(matrix_ptr,matrix_name_holder),col);
             col = 0;
+            /*Add matrix into tree, set value to -1 */
             matrix_name_holder++;
         }
     ;
@@ -71,6 +82,6 @@ row: NUM {matrix_insert(list_search(matrix_ptr,matrix_name_holder),row,col++,$1)
 
 main()
 {
-
     yyparse();
+    /*Call to print print_tree*/
 }
