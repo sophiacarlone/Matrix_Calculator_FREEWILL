@@ -90,7 +90,7 @@ int eval_tree( tree_t *t )
                 t->evaluation = eval_tree(t->left) / eval_tree(t->right);
 		break;
         case NUM:
-                t->evaluation = t->attribute; //how to get the value out of NUM?
+                t->evaluation = t->attribute; 
 		break;
         default:
                 fprintf( stderr, "Error: eval_tree, unknown type\n" );
@@ -147,8 +147,8 @@ void gencode( tree_t *t, int *registers, int start, int r){
 
 	/* case 0 */
 	if( (t->left == NULL) && (t->right == NULL) && (t->rank == 1) ){
-		// if(t->attribute == is num)
-			fprintf(fptr, "MOV %d, R%d\n", t->attribute, registers[start]);
+		//from now on, everything is a matrix
+		fprintf(fptr, "MOV %d, R%d\n", t->attribute, registers[start]);
 		//else{ //matrix
 
 		//}

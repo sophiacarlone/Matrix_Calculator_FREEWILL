@@ -14,10 +14,11 @@ list_t *matrix_ptr;
 %union {    /* token attributes */
     int ival;   /* NUM */
     int opval;  /* ADDOP, MULOP */
-
+    int *pval[][];
 }
 
 %token <ival> NUM
+%token <pval> MATRIX
 
 %left <opval> ADDOP
 %left <opval> MULOP
@@ -50,13 +51,10 @@ expr: expr ADDOP expr
         } 
         rows ']'      
         {
-            fprintf(stderr,"\nrow:%d ",row);
             set_row(list_search(matrix_ptr,matrix_name_holder),row);
             row = 0;
-            fprintf(stderr,"column:%d\n",col);
             set_col(list_search(matrix_ptr,matrix_name_holder),col);
             col = 0;
-            matrix_print(list_search(matrix_ptr,matrix_name_holder));
             matrix_name_holder++;
         }
     ;

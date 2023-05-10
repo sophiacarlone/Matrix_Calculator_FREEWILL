@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "y.tab.h"
 
 tree_t *make_tree (int v, matrix_t *m,tree_t *l, tree_t *r) {
     tree_t *p = (tree_t *) malloc(sizeof(tree_t));
