@@ -6,7 +6,7 @@
 
 typedef struct tree_s {
 	int type;	/* token types: ADDOP, MULOP, NUM */
-	int attribute;	/* token attribute */
+	int attribute;	/* token attribute, if matrix, row = /10, col = %10 */
 	struct tree_s *left;
 	struct tree_s *right;
 	int evaluation;

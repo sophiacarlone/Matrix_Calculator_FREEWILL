@@ -119,6 +119,11 @@ tree_t *factor()
 		value = expr();
 		match( ')' );
 	}
+	else if (current_token == '['){
+		match('[');	
+
+		match(']');
+	}
 	else if ( current_token == NUM ) {
 		match( NUM );
 		value = make_tree( NUM, NULL, NULL, current_attribute);
@@ -151,6 +156,15 @@ int get_token()
 			return c;
 		case '(': case ')': /* BRACKETS*/ 
 			fprintf( stderr, "[%c]", c );
+			return c;
+		case '[': case ']': /* MATRIX */ 
+			fprintf( stderr, "[%c]", c );
+			return c;
+		case ',': /* row part */ 
+			fprintf( stderr, "[COMMA:%c]", c );
+			return c;
+		case ';': /* rows */ 
+			fprintf( stderr, "[SEMICOLON:%c]", c );
 			return c;
 		case ' ': case '\t': /*tab*/
 			continue;
